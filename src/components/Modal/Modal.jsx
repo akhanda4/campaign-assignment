@@ -9,7 +9,6 @@ function Modal({ children }) {
     }
 
     useEffect(() => {
-        throw new Error("Modal component must be rendered inside a modal root element.");
         const modalRoot = document.getElementById("modal-root");
         if (modalRoot) {
             modalRoot.appendChild(elRef.current);
