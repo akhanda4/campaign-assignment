@@ -15,7 +15,7 @@ import "./Campaign.css";
 
 const CampaignGrid = () => {
   const gridRef = useRef();
-  const mockCampaigns = useMemo(() => generateMockCampaigns(50), []);
+  const mockCampaigns = useMemo(() => generateMockCampaigns(500), []);
   const [rowData, setRowData] = useState(mockCampaigns);
   const [quickFilterText, setQuickFilterText] = useState("");
   const [openModal, setOpenModal] = useState(false);
