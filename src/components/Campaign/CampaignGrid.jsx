@@ -8,7 +8,7 @@ import React, {
 import { AgGridReact } from "ag-grid-react";
 import { columnDefs } from "./CampaignColumnDefs.js";
 import { generateMockCampaigns } from "../../Api/Faker.js";
-import { useTheme, useThemeUpdate } from "../../ContextApi/ThemeContext.jsx";
+import { useTheme, useThemeUpdate, themeDark } from "../../ContextApi/ThemeContext.jsx";
 import Modal from "../Modal/Modal.jsx";
 import "common/AggridConfig.js";
 import "./Campaign.css";
@@ -23,6 +23,10 @@ const CampaignGrid = () => {
   const [editField, setEditField] = useState("");
   const [editValue, setEditValue] = useState("");
 
+  const theme = useTheme();
+  const toggleTheme = useThemeUpdate();
+
+  const isDarkTheme = theme === themeDark;
   const defaultColDef = useMemo(
     () => ({
       resizable: true,
@@ -63,15 +67,22 @@ const CampaignGrid = () => {
     [rowData]
   );
 
-  const handleFilterChanged = () => {
-    setTimeout(() => {
-      const api = gridRef.current.api;
+  const updateOverlayState = () => {
+    const api = gridRef.current?.api;
+    if (api) {
       if (api.getDisplayedRowCount() === 0) {
         api.showNoRowsOverlay();
       } else {
         api.hideOverlay();
       }
-    }, 0);
+    }
+  };
+
+  const handleFilterChanged = () => {
+    const api = gridRef.current?.api;
+    if (api) {
+      updateOverlayState();
+    }
   };
 
   const handleQuickFilter = (e) => {
@@ -86,6 +97,7 @@ const CampaignGrid = () => {
       api.showLoadingOverlay();
       setTimeout(() => {
         api.hideOverlay();
+        updateOverlayState();
       }, 1000);
     }
   }, []);
@@ -113,6 +125,48 @@ const CampaignGrid = () => {
   };
 
   const handleUpdate = () => {
+    let isValid = true;
+
+    switch (editField) {
+      case "budget":
+      case "spent":
+      case "impressions":
+      case "clicks":
+        if (isNaN(editValue) || editValue.trim() === "") {
+          isValid = false;
+          alert(`${editField} must be a valid number.`);
+        }
+        break;
+
+      case "startDate":
+      case "endDate":
+        if (isNaN(Date.parse(editValue))) {
+          isValid = false;
+          alert(`${editField} must be a valid date (e.g., DD-MM-YYYY).`);
+        }
+        break;
+
+      case "status":
+        const validStatuses = ["Draft", "Scheduled", "Active", "Completed", "Cancelled"];
+        if (!validStatuses.includes(editValue)) {
+          isValid = false;
+          alert(`${editField} must be one of: ${validStatuses.join(", ")}.`);
+        }
+        break;
+      case "channel":
+        const validChannels = ["Email", "Social Media", "Display", "SMS", "Search"];
+        if (!validChannels.includes(editValue)) {
+          isValid = false;
+          alert(`${editField} must be one of: ${validChannels.join(", ")}.`);
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    if (!isValid) return;
+
     const updatedData = rowData.map((row) => {
       if (selectedRows.some((selected) => selected.campaignId === row.campaignId)) {
         return { ...row, [editField]: editValue };
@@ -129,11 +183,12 @@ const CampaignGrid = () => {
         <input
           name="theme-toggler"
           type="checkbox"
-          onChange={useThemeUpdate()}
+          onChange={toggleTheme}
         />
         <label htmlFor="theme-toggler">Dark Mode</label>
-        <button onClick={exportToCsv}>Export CSV</button>
+        <button className="btn-export" onClick={exportToCsv}>Export CSV</button>
         <button
+          className="btn-mass-edit"
           onClick={handleModalOpen}
           disabled={selectedRows.length <= 1}
           style={{ marginLeft: "10px" }}
@@ -144,6 +199,7 @@ const CampaignGrid = () => {
 
       <input
         type="text"
+        className={`${isDarkTheme ? "dark-input" : "light-input"}`}
         placeholder="Search..."
         value={quickFilterText}
         onChange={handleQuickFilter}
@@ -154,7 +210,7 @@ const CampaignGrid = () => {
 
       <AgGridReact
         ref={gridRef}
-        theme={useTheme()}
+        theme={theme}
         rowData={rowData}
         columnDefs={columnDefs}
         onGridReady={onGridReady}
@@ -180,7 +236,6 @@ const CampaignGrid = () => {
                   onChange={(e) => setEditField(e.target.value)}
                 >
                   <option value="">Select Field</option>
-                  <option value="campaignId">CampaignId</option>
                   <option value="campaignName">CampaignName</option>
                   <option value="clientName">ClientName</option>
                   <option value="startDate">StartDate</option>

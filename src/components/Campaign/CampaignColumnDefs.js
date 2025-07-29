@@ -9,6 +9,8 @@ export const columnDefs = [
     filter: "agTextColumnFilter",
     width: 100,
     comparator: comparator,
+    valueFormatter: (params) => `#${params.value}`,
+    editable: false
   },
   {
     headerName: "Campaign Name",

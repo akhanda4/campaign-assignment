@@ -15,8 +15,8 @@ export const useThemeUpdate = () => {
   return React.useContext(ThemeToggleContext);
 };
 
-const themeLight = themeQuartz.withPart(colorSchemeLightWarm);
-const themeDark = themeQuartz.withPart(colorSchemeDarkBlue);
+export const themeLight = themeQuartz.withPart(colorSchemeLightWarm);
+export const themeDark = themeQuartz.withPart(colorSchemeDarkBlue);
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(themeLight);

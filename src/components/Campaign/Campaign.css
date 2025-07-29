@@ -82,6 +82,50 @@
   width: 100%;
 }
 
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+.btn-export {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-export:hover {
+  background-color: #0056b3;
+}
+
+.btn-export:active {
+  background-color: #003f7f;
+}
+
+.btn-mass-edit {
+  background-color: #28a745;
+  color: white;
+  margin-left: 10px;
+}
+
+.btn-mass-edit:hover {
+  background-color: #218838;
+}
+
+.btn-mass-edit:active {
+  background-color: #1e7e34;
+}
+
+.btn-mass-edit:disabled {
+  background-color: #6c757d;
+  color: #e9ecef;
+  cursor: not-allowed;
+}
+
 
 @media (max-width: 550px) {
   * {

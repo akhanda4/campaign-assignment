@@ -16,7 +16,7 @@ export const generateMockCampaigns = (count = 100) => {
     );
 
     return {
-      campaignId: `CMP-${1000 + i}`,
+      campaignId: `${1000 + i}`,
       campaignName: faker.company.catchPhrase(),
       clientName: faker.company.name(),
       startDate: faker.date.past().toLocaleDateString(),
