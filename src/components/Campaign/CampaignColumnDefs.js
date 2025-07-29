@@ -10,6 +10,7 @@ export const columnDefs = [
     pinned: 'left',
     width: 50,
     maxWidth: 50,
+    minWidth: 50,
     sortable: false,
     filter: false,
     editable: false,

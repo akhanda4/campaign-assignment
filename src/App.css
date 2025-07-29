@@ -37,3 +37,6 @@
 .dark-input::placeholder {
   color: #777777;
 }
+.ag-horizontal-left-spacer{
+  overflow: hidden;
+}
