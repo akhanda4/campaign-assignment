@@ -1,5 +1,8 @@
 # Campaign Assignment Project
 
+## Live Demo
+Check out the live version of the project here: [Campaign Assignment Live Demo](https://akhanda4.github.io/campaign-assignment/)
+
 This project demonstrates the use of **AG Grid** to create an interactive and feature-rich data table. Below is a detailed overview of the features implemented in this project.
 
 ## Features
