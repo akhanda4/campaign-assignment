@@ -1,5 +1,5 @@
-function comparator(valueA, valueB) {
-  return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+const comparator = (a, b) => {
+  return a.toLowerCase().localeCompare(b.toLowerCase());
 }
 
 export const columnDefs = [
@@ -15,8 +15,7 @@ export const columnDefs = [
     field: "campaignName",
     filter: "agTextColumnFilter",
     width: 350,
-    comparator: (valueA, valueB) =>
-      valueA.toLowerCase().localeCompare(valueB.toLowerCase()),
+    comparator: comparator,
   },
   {
     headerName: "Client Name",
@@ -37,10 +36,8 @@ export const columnDefs = [
   {
     headerName: "Status",
     field: "status",
-    filterParams: {
-      values: ["Completed", "Active", "Scheduled", "Draft", "Cancelled"],
-    },
     editable: false,
+    comparator: comparator,
   },
   {
     headerName: "Budget ($)",
@@ -77,11 +74,13 @@ export const columnDefs = [
     headerName: "Channel",
     field: "channel",
     comparator: comparator,
+    filter: "agTextColumnFilter",
   },
   {
     headerName: "Manager",
     field: "manager",
     comparator: comparator,
+
   },
   {
     headerName: "Thumbnail",
@@ -98,11 +97,5 @@ export const columnDefs = [
     field: "lastModified",
     filter: "agDateColumnFilter",
     cellEditor: "agDatePicker",
-    cellEditorParams: {
-      // Optionally set min/max dates or format
-      min: "2020-01-01",
-      max: "2030-12-31",
-      format: "dd-MM-yyyy",
-    },
   },
 ];

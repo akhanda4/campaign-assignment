@@ -9,14 +9,19 @@ import { AgGridReact } from "ag-grid-react";
 import { columnDefs } from "./CampaignColumnDefs.js";
 import { generateMockCampaigns } from "../../Api/Faker.js";
 import { useTheme, useThemeUpdate } from "../../ContextApi/ThemeContext.jsx";
+import Modal from "../Modal/Modal.jsx";
 import "common/AggridConfig.js";
 import "./Campaign.css";
 
 const CampaignGrid = () => {
   const gridRef = useRef();
-  const mockCampaigns = useMemo(() => generateMockCampaigns(500), []);
+  const mockCampaigns = useMemo(() => generateMockCampaigns(50), []);
   const [rowData, setRowData] = useState(mockCampaigns);
   const [quickFilterText, setQuickFilterText] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [editField, setEditField] = useState("");
+  const [editValue, setEditValue] = useState("");
 
   const defaultColDef = useMemo(
     () => ({
@@ -75,6 +80,49 @@ const CampaignGrid = () => {
     gridRef.current.api.setGridOption("quickFilterText", value);
   };
 
+  const handlePaginationChanged = useCallback(() => {
+    const api = gridRef.current?.api;
+    if (api) {
+      api.showLoadingOverlay();
+      setTimeout(() => {
+        api.hideOverlay();
+      }, 1000);
+    }
+  }, []);
+
+  const exportToCsv = () => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.exportDataAsCsv({
+        fileName: 'campaigns.csv',
+      });
+    }
+  };
+
+  const onSelectionChanged = () => {
+    const selectedNodes = gridRef.current.api.getSelectedNodes();
+    const selectedData = selectedNodes.map((node) => node.data);
+    setSelectedRows(selectedData);
+  };
+
+  const handleModalOpen = () => {
+    setOpenModal(true);
+  };
+
+  const handleModalClose = () => {
+    setOpenModal(false);
+  };
+
+  const handleUpdate = () => {
+    const updatedData = rowData.map((row) => {
+      if (selectedRows.some((selected) => selected.campaignId === row.campaignId)) {
+        return { ...row, [editField]: editValue };
+      }
+      return row;
+    });
+    setRowData(updatedData);
+    handleModalClose();
+  };
+
   return (
     <div className={`Ag-grid-container`}>
       <div className="theme-toggler">
@@ -84,6 +132,14 @@ const CampaignGrid = () => {
           onChange={useThemeUpdate()}
         />
         <label htmlFor="theme-toggler">Dark Mode</label>
+        <button onClick={exportToCsv}>Export CSV</button>
+        <button
+          onClick={handleModalOpen}
+          disabled={selectedRows.length <= 1}
+          style={{ marginLeft: "10px" }}
+        >
+          Mass Edit
+        </button>
       </div>
 
       <input
@@ -107,8 +163,58 @@ const CampaignGrid = () => {
         animateRows={true}
         onFilterChanged={handleFilterChanged}
         pagination={true}
+        rowSelection={"multiple"}
         paginationPageSize={20}
+        onPaginationChanged={handlePaginationChanged}
+        onSelectionChanged={onSelectionChanged}
       />
+      {openModal ? (
+        <Modal>
+          <div className="modal">
+            <div className="modal-content">
+              <h3>Mass Edit</h3>
+              <label>
+                Field to Edit:
+                <select
+                  value={editField}
+                  onChange={(e) => setEditField(e.target.value)}
+                >
+                  <option value="">Select Field</option>
+                  <option value="campaignId">CampaignId</option>
+                  <option value="campaignName">CampaignName</option>
+                  <option value="clientName">ClientName</option>
+                  <option value="startDate">StartDate</option>
+                  <option value="endDate">EndDate</option>
+                  <option value="status">Status</option>
+                  <option value="budget">Budget</option>
+                  <option value="spent">Spent</option>
+                  <option value="impressions">Impressions</option>
+                  <option value="clicks">Clicks</option>
+                  <option value="conversionRate">ConversionRate</option>
+                  <option value="channel">Channel</option>
+                  <option value="manager">Manager</option>
+                  <option value="campaign">Campaign</option>
+                  <option value="lastModified">Last Modified</option>
+                </select>
+              </label>
+              <label>
+                New Value:
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                />
+              </label>
+              <div className="modal-actions">
+                <button onClick={handleUpdate}>Update</button>
+                <button onClick={handleModalClose}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      ) :
+        null
+      }
     </div>
   );
 };
