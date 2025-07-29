@@ -4,6 +4,21 @@ const comparator = (a, b) => {
 
 export const columnDefs = [
   {
+    headerName: '',
+    checkboxSelection: true,
+    headerCheckboxSelection: true,
+    pinned: 'left',
+    width: 50,
+    maxWidth: 50,
+    sortable: false,
+    filter: false,
+    editable: false,
+    resizable: false,
+    cellClass: 'checkbox-cell',
+    suppressMenu: true,
+    suppressMovable: true,
+  },
+  {
     headerName: "Campaign ID",
     field: "campaignId",
     filter: "agTextColumnFilter",
